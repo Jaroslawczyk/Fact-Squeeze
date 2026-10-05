@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Fact Squeeze</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-wrap">
+        <div class="logo-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg>
+        </div>
+        <div>
+          <div class="brand">Fact Squeeze</div>
+          <div class="subtitle" data-i18n="subtitle">выжимка + проверка фактов</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button id="historyBtn" class="icon-btn" data-i18n-title="history" aria-label="History">
+          <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>
+        </button>
+        <button id="settingsBtn" class="icon-btn" data-i18n-title="settings" aria-label="Settings">
+          <svg viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V21h-4v-.08A1.7 1.7 0 0 0 8.97 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.52-1.03H3v-4h.08A1.7 1.7 0 0 0 4.6 8.94a1.7 1.7 0 0 0-.34-1.88L4.2 7l2.83-2.83.06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 10 3.05V3h4v.05a1.7 1.7 0 0 0 1.03 1.52 1.7 1.7 0 0 0 1.88-.34l.06-.06L19.8 7l-.06.06a1.7 1.7 0 0 0-.34 1.88A1.7 1.7 0 0 0 20.92 10H21v4h-.08A1.7 1.7 0 0 0 19.4 15Z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section id="mainView" class="view">
+        <div class="hero-controls">
+          <div class="select-wrap">
+            <span class="control-label" data-i18n="analysisMode">Режим</span>
+            <select id="mode" data-i18n-title="analysisMode">
+              <option value="economy" data-i18n="modeEconomy">Экономно</option>
+              <option value="balanced" data-i18n="modeBalanced">Баланс</option>
+              <option value="deep" data-i18n="modeDeep">Глубоко</option>
+            </select>
+          </div>
+          <button id="analyzeBtn" class="primary action-main">
+            <svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/></svg>
+            <span id="analyzeBtnText" data-i18n="makeSummary">Сделать выжимку</span>
+          </button>
+        </div>
+
+        <div id="restoreNotice" class="restore-notice hidden"></div>
+        <div id="status" class="status muted" data-i18n="statusReady">Откройте страницу и нажмите «Сделать выжимку».</div>
+        <div id="error" class="error hidden"></div>
+        <div id="report" class="hidden report-stack"></div>
+      </section>
+
+      <section id="historyView" class="view hidden">
+        <div class="view-heading">
+          <button id="historyBackBtn" class="back-icon" data-i18n-title="back" aria-label="Back">
+            <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <div>
+            <h2 data-i18n="history">История</h2>
+            <p data-i18n="historySubtitle">Сохранённые выжимки доступны после перезапуска Edge.</p>
+          </div>
+          <button id="clearHistoryBtn" class="ghost danger-ghost" data-i18n="clearHistory">Очистить</button>
+        </div>
+        <div id="historyList" class="history-list"></div>
+      </section>
+
+      <section id="settingsView" class="view hidden">
+        <div class="view-heading compact-heading">
+          <button id="backBtn" class="back-icon" data-i18n-title="back" aria-label="Back">
+            <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <div>
+            <h2 data-i18n="settings">Настройки</h2>
+            <p data-i18n="settingsSubtitle">Модель, язык, фактчек и стоимость.</p>
+          </div>
+        </div>
+
+        <section class="settings-card accent-card">
+          <div class="section-kicker" data-i18n="languageAndOutput">Язык интерфейса и ответа</div>
+          <label>
+            <span data-i18n="language">Язык</span>
+            <select id="language">
+              <option value="ru">Русский</option>
+              <option value="en">English</option>
+              <option value="pl">Polski</option>
+            </select>
+          </label>
+          <p class="hint" data-i18n="languageHint">Интерфейс меняется сразу. Новые ответы ИИ будут на выбранном языке; внутренний анализ может выполняться в более экономном для модели формате.</p>
+        </section>
+
+        <section class="settings-card">
+          <div class="section-kicker">LLM</div>
+          <label><span data-i18n="provider">Провайдер</span>
+            <select id="provider">
+              <option value="deepseek">DeepSeek</option>
+              <option value="xai">xAI / Grok</option>
+              <option value="custom">OpenAI-compatible API</option>
+            </select>
+          </label>
+          <label><span data-i18n="model">Модель</span>
+            <input id="model" type="text" autocomplete="off" />
+          </label>
+          <label><span>API key</span>
+            <input id="apiKey" type="password" autocomplete="off" data-i18n-placeholder="apiKeyPlaceholder" />
+          </label>
+          <label id="customEndpointWrap" class="hidden"><span data-i18n="endpoint">Chat Completions endpoint</span>
+            <input id="customEndpoint" type="url" placeholder="https://example.com/v1/chat/completions" />
+          </label>
+          <button id="testApiBtn" class="secondary full-width" data-i18n="testApi">Проверить LLM API</button>
+          <div id="saveStatus" class="status muted"></div>
+        </section>
+
+        <section class="settings-card">
+          <div class="section-kicker" data-i18n="factChecking">Проверка фактов</div>
+          <label class="check-row"><input id="factCheck" type="checkbox" /> <span data-i18n="factCheckLabel">Проверять ключевые тезисы через веб-поиск</span></label>
+          <label><span data-i18n="searchApiLabel">Поисковый API — Tavily</span>
+            <input id="tavilyKey" type="password" autocomplete="off" data-i18n-placeholder="tavilyPlaceholder" />
+          </label>
+          <div class="key-separation-note" data-i18n="searchKeySeparation">Это отдельный ключ поиска. DeepSeek/xAI API key сюда не подходит.</div>
+          <button id="testSearchBtn" class="secondary full-width" data-i18n="testSearch">Проверить веб-поиск</button>
+          <div id="searchStatus" class="status muted compact-status"></div>
+          <p class="hint" data-i18n="factCheckHint">Без поискового API расширение может оценить текст, но не может независимо подтвердить факты.</p>
+        </section>
+
+        <details class="settings-card pricing-card">
+          <summary data-i18n="costAndCache">Цена и кэш</summary>
+          <div class="grid2">
+            <label><span data-i18n="inputPrice">Input, $ / 1M токенов</span><input id="inputPrice" type="number" min="0" step="0.001" /></label>
+            <label><span data-i18n="outputPrice">Output, $ / 1M токенов</span><input id="outputPrice" type="number" min="0" step="0.001" /></label>
+            <label><span data-i18n="tavilyPrice">Tavily, $ / credit</span><input id="tavilyPrice" type="number" min="0" step="0.001" /></label>
+            <label><span data-i18n="cacheHours">Быстрый кэш, часов</span><input id="cacheHours" type="number" min="0" max="168" step="1" /></label>
+          </div>
+          <p class="hint details-hint" data-i18n="cacheHint">Быстрый кэш экономит повторные запросы. История хранится отдельно и не исчезает после этого срока.</p>
+        </details>
+
+        <section class="settings-card creator-card">
+          <div class="section-kicker" data-i18n="author">Автор и контакты</div>
+          <div class="creator-name">Jaroslawczyk</div>
+          <div class="contact-links">
+            <a href="https://github.com/Jaroslawczyk" target="_blank" rel="noreferrer">
+              <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.86c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.64-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.58 9.58 0 0 1 12 6.84c.85 0 1.71.11 2.51.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.86V21c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg>
+              GitHub
+            </a>
+            <a href="mailto:jaro9869004@gmail.com">
+              <svg viewBox="0 0 24 24"><path d="M3 5h18v14H3z"/><path d="m3 6 9 7 9-7"/></svg>
+              jaro9869004@gmail.com
+            </a>
+          </div>
+        </section>
+
+        <div class="settings-actions">
+          <button id="saveBtn" class="primary" data-i18n="save">Сохранить</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <span></span>
+      <span id="versionLabel">v0.6.0</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
